@@ -47,12 +47,12 @@ Bear in mind, handling bad inputs from clients doesn't necessarily have to lead 
 
 ### GET `/api/users/:username`
 
--
+- 404
 
 ### GET `/api/articles/:article_id`
 
-- Bad `article_id` (e.g. `/dog`)
-- Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
+- Bad `article_id` (e.g. `/dog`) 400
+- Well formed `article_id` that doesn't exist in the database (e.g. `/999999`) 404
 
 ### PATCH `/api/articles/:article_id`
 
