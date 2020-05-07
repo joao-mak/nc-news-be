@@ -28,8 +28,14 @@
   "devDependencies": {
     "express": "^4.17.1",
     "jest": "^25.5.4",
+    "jest-sorted": "^1.0.6",
     "knex": "^0.21.1",
     "pg": "^8.0.3",
     "supertest": "^4.0.2"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "jest-sorted"
+    ]
   }
 }

@@ -20,13 +20,14 @@ exports.makeRefObj = list => {
 exports.formatComments = (comments, articleRef) => {
     const newComments = [...comments];
     const formatKeys = comment => {
-        comment.author = comment.created_by;
-        comment.article_id = articleRef[comment.belongs_to];
-        const date = new Date(comment.created_at);
-        comment.created_at = date;
-        delete comment.created_by;
-        delete comment.belongs_to;
-        return comment;
+        const newComment = {...comment}
+        newComment.author = newComment.created_by;
+        newComment.article_id = articleRef[newComment.belongs_to];
+        const date = new Date(newComment.created_at);
+        newComment.created_at = date;
+        delete newComment.created_by;
+        delete newComment.belongs_to;
+        return newComment;
     }
     let formatted = newComments.map(comment => formatKeys(comment));
     return formatted;

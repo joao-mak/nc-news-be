@@ -8,10 +8,8 @@ const {
 const { formatDates, formatComments, makeRefObj } = require('../utils/utils');
 
 exports.seed = function(knex) {
-  console.log('dropping all tables...')
   return knex.migrate.rollback()
     .then(() => {
-      console.log('seeding all tables...')
       return knex.migrate.latest()
     })
     .then (() => {

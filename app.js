@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const apiRouter = require('./routes/api.router');
-const { customErrors } = require('./controllers/errors.controller');
+const { handleCustomErrors, handleInternalErrors } = require('./controllers/errors.controller');
 
  // adds a body onto the request object
 app.use(express.json());
@@ -14,6 +14,7 @@ app.all('/*',(req, res, next) => {
 })
 
 //error handling middleware
-app.use(customErrors);
+app.use(handleCustomErrors);
+app.use(handleInternalErrors);
 
 module.exports = app;

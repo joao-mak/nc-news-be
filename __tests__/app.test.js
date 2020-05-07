@@ -10,7 +10,7 @@ afterAll(() => connection.destroy());
 describe('/api', () => {
     test('REQUEST 404: resource not found', () => {
         return request(app)
-            .patch('/invalid-path')
+            .get('/invalid-path')
             .expect(404)
             .then(({body}) => {
                 expect(body.msg).toBe('path not found')
@@ -36,6 +36,18 @@ describe('/api', () => {
                     })
                 })
         })
+        // test.only('405: invalid method', () => {
+        //     const invalidMethods = ['post', 'patch', 'delete', 'put'];
+        //     const methodPromises = invalidMethods.map((method) => {
+        //         return request(app)
+        //         [method]('/api/topics')
+        //         .expect(405)
+        //         .then(({body}) => {
+        //             expect(body.msg).toBe('Invalid method');
+        //         })
+        //     })
+        //     return Promise.all(methodPromises);
+        // })
       
     })
     describe('/users', () => {
@@ -86,6 +98,62 @@ describe('/api', () => {
                     .then(({body}) => {
                         expect(body.article.votes).toBe(150);
                     })
+            })
+            // test('PATCH 400: bad request', () => {
+            //     return request(app)
+            //         .patch('/api/articles/notAnArticle').send({ inc_votes : 50})
+            //         .expect(400)
+            //         .then(({body}) => {
+            //             expect(body.msg).toBe('bad request');
+            //         })
+            // })
+            describe('/comments', () => {
+                test('POST 200: returns a comment object', () => {
+                    return request(app)
+                        .post('/api/articles/1/comments')
+                        .send({
+                            username: 'butter_bridge',
+                            body: 'agree to disagree, mate'
+                        })
+                        .expect(200)
+                        .then(({body}) => {
+                            expect(typeof body.comment).toBe('object');
+                        })
+                })
+                test('GET 200: returns array of comments', () => {
+                    return request(app)
+                        .get('/api/articles/1/comments')
+                        .expect(200)
+                        .then(({body}) => {
+                            expect(Array.isArray(body.comments)).toBe(true);
+                            expect(body.comments.length).toBe(5);
+                        })
+                })
+                test('GET 200: defaults to sort by created_at', () => {
+                    return request(app)
+                        .get('/api/articles/1/comments')
+                        .expect(200)
+                        .then(({body}) => {
+                            expect(body.comments).toBeSortedBy('created_at', {coerce: true});
+                        })
+                })
+                test('GET 200: correctly accepts sort_by query', () => {
+                    return request(app)
+                        .get('/api/articles/1/comments?sort_by=comment_id')
+                        .expect(200)
+                        .then(({body}) => {
+                            expect(body.comments).toBeSortedBy('comment_id', { descending: true });
+                        })
+                })
+                test('GET 200: correctly accepts sort_by and order queries', () => {
+                    return request(app)
+                        .get('/api/articles/1/comments?sort_by=comment_id&order=asc')
+                        .expect(200)
+                        .then(({body}) => {
+                            expect(body.comments).toBeSortedBy('comment_id', { ascending: true });
+                        })
+                })
+
             })
         })
     })
