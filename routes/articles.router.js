@@ -3,17 +3,18 @@ const articlesRouter = express.Router()
 const { 
     getArticles,
     getArticleById, 
-    patchArticleById, 
-    postComment, 
-    getCommentsByArticleId } = require('../controllers/articles.controller');
+    patchArticleById } = require('../controllers/articles.controller.js');
+
+const { postComment, getCommentsByArticleId } = require('../controllers/comments.controller.js');
 const { send405 } = require('../controllers/errors.controller.js');
 
-articlesRouter
-    .get('', getArticles)
-    .get('/:article_id', getArticleById)
-    .patch('/:article_id', patchArticleById)
-    .post('/:article_id/comments', postComment)
-    .get('/:article_id/comments', getCommentsByArticleId)
+articlesRouter.route('').get(getArticles).all(send405);
+
+articlesRouter.route('/:article_id').get(getArticleById).patch(patchArticleById).all(send405)
+
+articlesRouter.route('/:article_id/comments')
+    .post(postComment)
+    .get(getCommentsByArticleId)
     .all(send405);
     
 

@@ -36,22 +36,34 @@ describe('/api', () => {
                     })
                 })
         })
-        // test.only('405: invalid method', () => {
-        //     const invalidMethods = ['post', 'patch', 'delete', 'put'];
-        //     const methodPromises = invalidMethods.map((method) => {
-        //         return request(app)
-        //         [method]('/api/topics')
-        //         .expect(405)
-        //         .then(({body}) => {
-        //             expect(body.msg).toBe('Invalid method');
-        //         })
-        //     })
-        //     return Promise.all(methodPromises);
-        // })
+        test('405: invalid method', () => {
+            const invalidMethods = ['post', 'patch', 'delete', 'put'];
+            const methodPromises = invalidMethods.map((method) => {
+                return request(app)
+                [method]('/api/topics')
+                .expect(405)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid method');
+                })
+            })
+            return Promise.all(methodPromises);
+        })
       
     })
     describe('/users', () => {
         describe('/:username', () => {
+            test('405: invalid methods correctly caught', () => {
+                const invalidMethods = ['post', 'patch', 'delete', 'put'];
+                const methodPromises = invalidMethods.map((method) => {
+                    return request(app)
+                    [method]('/api/users/:username')
+                    .expect(405)
+                    .then(({body}) => {
+                        expect(body.msg).toBe('Invalid method');
+                    })
+                })
+                return Promise.all(methodPromises);
+            })
             test('GET 200: returns a username object', () => {
                 return request(app)
                     .get('/api/users/butter_bridge')
@@ -70,10 +82,30 @@ describe('/api', () => {
                         expect(body.user.hasOwnProperty('name')).toBe(true)
                     })
             })
+            test('GET 404: user not found', () => {
+                return request(app)
+                    .get('/api/users/not-a-real-username')
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe('username not found')
+                    })
+            })
         })
     })
     describe('/articles', () => {
         describe('/:article_id', () => {
+            test('405: invalid methods correctly caught', () => {
+                const invalidMethods = ['post', 'delete', 'put'];
+                const methodPromises = invalidMethods.map((method) => {
+                    return request(app)
+                    [method]('/api/articles/1')
+                    .expect(405)
+                    .then(({body}) => {
+                        expect(body.msg).toBe('Invalid method');
+                    })
+                })
+                return Promise.all(methodPromises);
+            })
             test('GET 200: returns an article object', () => {
                 return request(app)
                     .get('/api/articles/1')
@@ -99,15 +131,27 @@ describe('/api', () => {
                         expect(body.article.votes).toBe(150);
                     })
             })
-            test('PATCH 400: bad request', () => {
+            test('PATCH 400: invalid request', () => {
                 return request(app)
                     .patch('/api/articles/notAnArticle').send({ inc_votes : 50})
                     .expect(400)
                     .then( ({body}) => {
-                        expect(body.msg).toBe('bad request');
+                        expect(body.msg).toBe('Invalid request');
                     })
             })
             describe('/comments', () => {
+                test('405: invalid methods correctly caught', () => {
+                    const invalidMethods = ['post', 'patch', 'delete', 'put'];
+                    const methodPromises = invalidMethods.map((method) => {
+                        return request(app)
+                        [method]('/api/articles')
+                        .expect(405)
+                        .then(({body}) => {
+                            expect(body.msg).toBe('Invalid method');
+                        })
+                    })
+                    return Promise.all(methodPromises);
+                })
                 test('POST 200: returns a comment object', () => {
                     return request(app)
                         .post('/api/articles/1/comments')
@@ -155,6 +199,18 @@ describe('/api', () => {
                 })
 
             })
+        })
+        test('405: invalid methods correctly caught', () => {
+            const invalidMethods = ['patch', 'delete', 'put'];
+            const methodPromises = invalidMethods.map((method) => {
+                return request(app)
+                [method]('/api/articles/1/comments')
+                .expect(405)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid method');
+                })
+            })
+            return Promise.all(methodPromises);
         })
         test('GET 200: returns with an array of articles', () => {
             return request(app)

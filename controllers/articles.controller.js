@@ -1,15 +1,13 @@
 const {
     selectArticles,
     selectArticleById, 
-    updateArticleById, 
-    insertComment,
-    selectCommentsByArticleId } = require('../models/articles.models.js')
+    updateArticleById } = require('../models/articles.models.js')
 
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params;
     return selectArticleById(article_id)
         .then((article) => {
-            res.status(200).send({ article: article[0] });
+            res.status(200).send({ article });
         })
         .catch(next);
 }
@@ -17,35 +15,11 @@ const getArticleById = (req, res, next) => {
 const patchArticleById = (req, res, next) => {
     const { article_id } = req.params;
     const { inc_votes } = req.body;
-    return selectArticleById (article_id)
+    return updateArticleById (article_id, inc_votes)
         .then((article) => {
-            const newVotes = article[0].votes + inc_votes;
-            return updateArticleById( article_id, newVotes)
+            res.status(200).send({ article });
         })
-        .then((article) => {
-            res.status(200).send({ article: article[0] });
-        })
-        .catch(next)
-}
-
-const postComment = (req, res, next) => {
-    const { article_id } = req.params;
-    const comment = req.body;
-    return insertComment(article_id, comment)
-        .then((comment) => {
-            res.status(200).send({ comment })
-        })
-        .catch(next)
-}
-
-const getCommentsByArticleId = (req, res, next) => {
-    const { article_id } = req.params;
-    const { sort_by, order } = req.query;
-    return selectCommentsByArticleId(article_id, sort_by, order)
-        .then((comments) => {
-            res.status(200).send({ comments })
-        })
-        .catch(next)
+        .catch(next);
 }
 
 const getArticles = (req, res, next) => {
@@ -58,6 +32,4 @@ const getArticles = (req, res, next) => {
 module.exports = { 
     getArticles,
     getArticleById, 
-    patchArticleById, 
-    postComment, 
-    getCommentsByArticleId }
+    patchArticleById }

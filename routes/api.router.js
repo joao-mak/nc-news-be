@@ -1,13 +1,13 @@
 const express = require('express');
 const apiRouter = express.Router();
-const getTopics = require('./topics.router.js');
-const getUserByUsername = require('./users.router.js');
-const getArticleById = require('./articles.router.js');
+const topicsRouter = require('./topics.router.js');
+const usersRouter = require('./users.router.js');
+const articlesRouter = require('./articles.router.js');
 
-apiRouter.use('/topics', getTopics)
+apiRouter.use('/topics', topicsRouter);
 
-apiRouter.use('/users', getUserByUsername);
+apiRouter.use('/users', usersRouter);
 
-apiRouter.use('/articles', getArticleById)
+apiRouter.use('/articles', articlesRouter);
 
 module.exports = apiRouter;
