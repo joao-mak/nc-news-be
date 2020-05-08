@@ -99,14 +99,14 @@ describe('/api', () => {
                         expect(body.article.votes).toBe(150);
                     })
             })
-            // test('PATCH 400: bad request', () => {
-            //     return request(app)
-            //         .patch('/api/articles/notAnArticle').send({ inc_votes : 50})
-            //         .expect(400)
-            //         .then(({body}) => {
-            //             expect(body.msg).toBe('bad request');
-            //         })
-            // })
+            test('PATCH 400: bad request', () => {
+                return request(app)
+                    .patch('/api/articles/notAnArticle').send({ inc_votes : 50})
+                    .expect(400)
+                    .then( ({body}) => {
+                        expect(body.msg).toBe('bad request');
+                    })
+            })
             describe('/comments', () => {
                 test('POST 200: returns a comment object', () => {
                     return request(app)
@@ -155,6 +155,14 @@ describe('/api', () => {
                 })
 
             })
+        })
+        test('GET 200: returns with an array of articles', () => {
+            return request(app)
+                .get('/api/articles')
+                .expect(200)
+                .then(({body}) => {
+                    expect(Array.isArray(body.articles)).toBe(true);
+                })
         })
     })
 })

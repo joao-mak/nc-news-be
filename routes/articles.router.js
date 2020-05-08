@@ -1,6 +1,7 @@
 const express = require('express')
 const articlesRouter = express.Router()
 const { 
+    getArticles,
     getArticleById, 
     patchArticleById, 
     postComment, 
@@ -8,6 +9,7 @@ const {
 const { send405 } = require('../controllers/errors.controller.js');
 
 articlesRouter
+    .get('', getArticles)
     .get('/:article_id', getArticleById)
     .patch('/:article_id', patchArticleById)
     .post('/:article_id/comments', postComment)

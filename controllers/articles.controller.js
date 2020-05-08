@@ -1,4 +1,5 @@
-const { 
+const {
+    selectArticles,
     selectArticleById, 
     updateArticleById, 
     insertComment,
@@ -47,7 +48,15 @@ const getCommentsByArticleId = (req, res, next) => {
         .catch(next)
 }
 
+const getArticles = (req, res, next) => {
+    return selectArticles()
+        .then((articles) => {
+            res.status(200).send({ articles })
+        })
+}
+
 module.exports = { 
+    getArticles,
     getArticleById, 
     patchArticleById, 
     postComment, 

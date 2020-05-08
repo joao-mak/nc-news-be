@@ -1,8 +1,9 @@
 const knex = require('../db/connection');
 
 exports.selectArticleById = (article_id) => {
-    if (isNaN(article_id))
-        Promise.reject({status: 400, msg: 'bad request'})
+    if (isNaN(article_id)){
+        return Promise.reject({ status: 400, msg: 'bad request' })
+    }
     return knex('articles')
         .select('*')
         .where({article_id});
@@ -29,7 +30,7 @@ exports.insertComment = (article_id, comment) => {
 }
  
 exports.selectCommentsByArticleId = (article_id, sort_by, order) => {
-    return knex.select('author')
+    return knex.select('*')
         .from('articles')
         .where({article_id})
         .then((res) => {
@@ -41,3 +42,11 @@ exports.selectCommentsByArticleId = (article_id, sort_by, order) => {
         })
         
 }
+
+exports.selectArticles = () => {
+    return knex('articles').select('*')
+}
+
+knex('users')
+  .join('contacts', 'users.id', '=', 'contacts.user_id')
+  .select('users.id', 'contacts.phone')

@@ -13,12 +13,13 @@ exports.makeRefObj = list => {
     if (list.length === 0){
         return lookup;
     }
-    list.map(obj => lookup[obj['title']] = obj['article_id'])
+    list.forEach(obj => {
+        lookup[obj['title']] = obj['article_id'];
+    })
     return lookup;
 };
 
 exports.formatComments = (comments, articleRef) => {
-    const newComments = [...comments];
     const formatKeys = comment => {
         const newComment = {...comment}
         newComment.author = newComment.created_by;
@@ -29,6 +30,6 @@ exports.formatComments = (comments, articleRef) => {
         delete newComment.belongs_to;
         return newComment;
     }
-    let formatted = newComments.map(comment => formatKeys(comment));
+    let formatted = comments.map(comment => formatKeys(comment));
     return formatted;
 };
