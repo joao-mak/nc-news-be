@@ -3,6 +3,9 @@ const {
     selectArticleById, 
     updateArticleById } = require('../models/articles.models.js')
 
+const { selectUserByUsername } = require('../models/users.models.js')
+const { selectTopicBySlug } = require('../models/topics.models.js')
+
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params;
     return selectArticleById(article_id)
@@ -24,8 +27,11 @@ const patchArticleById = (req, res, next) => {
 
 const getArticles = (req, res, next) => {
     const { sort_by, order, author, topic } = req.query;
-    return selectArticles(sort_by, order, author, topic)
-        .then((articles) => {
+    const queries = [selectArticles(sort_by, order, author, topic)]
+    if (author) queries.push(selectUserByUsername(author));
+    if (topic) queries.push(selectTopicBySlug(topic));
+    return Promise.all(queries)
+        .then(([articles]) => {
             res.status(200).send({ articles })
         })
         .catch(next)

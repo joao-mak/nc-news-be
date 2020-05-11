@@ -1,4 +1,4 @@
-const { selectTopics } = require('../models/topics.models.js')
+const { selectTopics, selectTopicBySlug } = require('../models/topics.models.js')
 
 const fetchTopics = (req, res, next) => {
     return selectTopics()
@@ -8,4 +8,12 @@ const fetchTopics = (req, res, next) => {
         .catch(next);
 }
 
-module.exports = fetchTopics
+const fetchTopicBySlug = (req, res, next) => {
+    const { topic } = req.params;
+    return selectTopicBySlug(topic)
+        .then((topic) => {
+            res.status(200).send({ topic })
+        })
+        .catch(next);
+}
+module.exports = { fetchTopics, fetchTopicBySlug }

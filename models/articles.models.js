@@ -2,24 +2,35 @@ const knex = require('../db/connection');
 
 exports.selectArticleById = (article_id) => {
 
-    return knex('articles')
-        .select('*')
-        .where({article_id})
+    return knex.select('articles.*')
+        .count('comments.comment_id as comment_count')
+        .from('articles')
+        .leftJoin('comments', 'articles.article_id','=','comments.article_id')
+        .groupBy('articles.article_id')
+        .where('articles.article_id', article_id)
         .then((articles) => {
             if (articles.length === 0){
                 return Promise.reject({ status: 404, msg: 'Article not found' })
             }
             return articles[0];
-        });   
+        }); 
+
+
+
+
 }
 
 exports.updateArticleById = (article_id, votes) => {
-    if (typeof votes !== 'number') {
+    let incValue = 0;
+    if (typeof votes === 'number') {
+        incValue = votes;
+    }
+    else if (typeof votes !== 'undefined') {
         return Promise.reject({ status: 400, msg: 'Invalid request' })
     }
     return knex('articles')
         .where({article_id})
-        .increment({votes} || 0)
+        .increment('votes', incValue)
         .returning('*')
         .then((articles) => {
             if (articles.length === 0){
@@ -30,7 +41,6 @@ exports.updateArticleById = (article_id, votes) => {
 }
 
 exports.selectArticles = (sort_by, order, author, topic) => {
-
     const validOrder = [undefined, 'asc', 'desc']
     if (!validOrder.includes(order)) {
         return Promise.reject({ status: 400, msg: 'Invalid request' })
@@ -56,11 +66,4 @@ exports.selectArticles = (sort_by, order, author, topic) => {
             if (author) query.where('articles.author', author)
             if (topic) query.where('articles.topic', topic)
         })
-        .then((articles) => {
-            if (articles.length === 0) 
-                {return Promise.reject({ status: 404, msg: 'Column not found'})}
-            return articles
-        });
-        
-        
 }

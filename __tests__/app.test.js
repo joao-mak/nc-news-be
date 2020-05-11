@@ -25,6 +25,18 @@ describe('/api', () => {
             })
     })
     describe('/topics', () => {
+        test('405: invalid method', () => {
+            const invalidMethods = ['post', 'patch', 'delete', 'put'];
+            const methodPromises = invalidMethods.map((method) => {
+                return request(app)
+                [method]('/api/topics')
+                .expect(405)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid method');
+                })
+            })
+            return Promise.all(methodPromises);
+        })
         test('GET 200: responds with array of topics', () => {
             return request(app)
                 .get('/api/topics')
@@ -44,17 +56,24 @@ describe('/api', () => {
                     })
                 })
         })
-        test('405: invalid method', () => {
-            const invalidMethods = ['post', 'patch', 'delete', 'put'];
-            const methodPromises = invalidMethods.map((method) => {
+        describe('/:topic', () => {
+            test('GET 200: returns a topic by valid slug', () => {
                 return request(app)
-                [method]('/api/topics')
-                .expect(405)
+                .get('/api/topics/mitch')
+                .expect(200)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid method');
+                    expect(typeof body.topic).toBe('object')
+                    expect(body.topic.hasOwnProperty('slug')).toBe(true)
                 })
             })
-            return Promise.all(methodPromises);
+            test('GET 404: topic not found', () => {
+                return request(app)
+                .get('/api/topics/eu')
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Topic not found')
+                })
+            })
         })
     })
     describe('/users', () => {
@@ -164,7 +183,7 @@ describe('/api', () => {
                 .get('/api/articles?topic=me')
                 .expect(404)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Column not found');
+                    expect(body.msg).toBe('Topic not found');
                 })
         })
         test('GET 200: filter by author works (valid author)', () => {
@@ -180,7 +199,23 @@ describe('/api', () => {
                 .get('/api/articles?author=me')
                 .expect(404)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Column not found');
+                    expect(body.msg).toBe('Username not found');
+                })
+        })
+        test('GET 200: filter by topic works (topic with no articles)', () => {
+            return request(app)
+                .get('/api/articles?topic=paper')
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.articles.length).toBe(0);
+                })
+        })
+        test('GET 200: filter by author works (author with no articles)', () => {
+            return request(app)
+                .get('/api/articles?author=lurker')
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.articles.length).toBe(0);
                 })
         })
         test('GET 400: invalid sort', () => {
@@ -227,6 +262,7 @@ describe('/api', () => {
                         expect(body.article.author).toBe('butter_bridge');
                         expect(body.article.title).toBe('Living in the shadow of a great man');
                         expect(body.article.body).toBe('I find this existence challenging');
+                        expect(body.article.comment_count).toBe('13');
                     })
             })
             test('GET 400: bad request (invalid article id)',() => {
@@ -262,13 +298,13 @@ describe('/api', () => {
                         expect(body.msg).toBe('Article not found');
                     })
             })
-            test('PATCH 400: invalid request body (no inc_votes)', () => {
+            test('PATCH 200: unchanged article (no inc_votes)', () => {
                 return request(app)
                     .patch('/api/articles/1')
                     .send({})
-                    .expect(400)
+                    .expect(200)
                     .then(({body}) => {
-                        expect(body.msg).toBe('Invalid request');
+                        expect(body.article.votes).toBe(100);
                     })
             })
             test('PATCH 400: invalid request body (inc_votes not a number))', () => {
@@ -302,14 +338,14 @@ describe('/api', () => {
                     })
                     return Promise.all(methodPromises);
                 })
-                test('POST 200: returns a comment object', () => {
+                test('POST 201: returns a comment object', () => {
                     return request(app)
                         .post('/api/articles/1/comments')
                         .send({
                             username: 'butter_bridge',
                             body: 'agree to disagree, mate'
                         })
-                        .expect(200)
+                        .expect(201)
                         .then(({body}) => {
                             expect(typeof body.comment).toBe('object');
                             expect(body.comment.hasOwnProperty('comment_id'));
@@ -466,13 +502,13 @@ describe('/api', () => {
                         expect(body.msg).toBe('Invalid request');
                     })
             })
-            test('PATCH 400: invalid request body (no inc_votes)', () => {
+            test('PATCH 200: unchanged comment (no inc_votes)', () => {
                 return request(app)
                     .patch('/api/comments/1')
                     .send({})
-                    .expect(400)
+                    .expect(200)
                     .then(({body}) => {
-                        expect(body.msg).toBe('Invalid request');
+                        expect(body.comment.votes).toBe(14);
                     })
             })
             test('PATCH 400: invalid request body (inc_votes not a number))', () => {

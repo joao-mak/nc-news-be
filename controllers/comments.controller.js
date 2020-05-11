@@ -8,7 +8,7 @@ const postComment = (req, res, next) => {
     const comment = req.body;
     return insertComment(article_id, comment)
         .then((comment) => {
-            res.status(200).send({ comment })
+            res.status(201).send({ comment })
         })
         .catch(next)
 }

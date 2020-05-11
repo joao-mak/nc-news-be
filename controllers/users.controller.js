@@ -9,4 +9,4 @@ const fetchUserByUsername = (req, res, next) => {
         .catch(next);
 }
 
-module.exports = fetchUserByUsername;
+module.exports = { fetchUserByUsername };

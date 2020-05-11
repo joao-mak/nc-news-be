@@ -30,12 +30,16 @@ exports.insertComment = (article_id, comment) => {
 }
 
 exports.updateCommentById = (article_id, votes) => {
-    if (typeof votes !== 'number') {
+    let incValue = 0;
+    if (typeof votes === 'number') {
+        incValue = votes;
+    }
+    else if (typeof votes !== 'undefined') {
         return Promise.reject({ status: 400, msg: 'Invalid request' })
     }
     return knex('comments')
         .where({article_id})
-        .increment({votes} || 0)
+        .increment('votes', incValue)
         .returning('*')
         .then((comment) => {
             if (comment.length === 0)
