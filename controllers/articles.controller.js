@@ -23,10 +23,12 @@ const patchArticleById = (req, res, next) => {
 }
 
 const getArticles = (req, res, next) => {
-    return selectArticles()
+    const { sort_by, order, author, topic } = req.query;
+    return selectArticles(sort_by, order, author, topic)
         .then((articles) => {
             res.status(200).send({ articles })
         })
+        .catch(next)
 }
 
 module.exports = { 

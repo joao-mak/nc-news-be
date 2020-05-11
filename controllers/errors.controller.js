@@ -11,9 +11,12 @@ exports.send405 = (req, res, next) => {
 }
 
 exports.handlePSQLErrors = (err, req, res, next) => {
-    const badReqCodes = ['22P02'];
+    const badReqCodes = ['22P02', '42703'];
     if (badReqCodes.includes(err.code)) {
         res.status(400).send({msg: 'Invalid request'})
+    }
+    else {
+        next(err);
     }
 }
 
