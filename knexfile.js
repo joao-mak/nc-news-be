@@ -10,7 +10,6 @@ const baseConfig = {
     directory: './db/seeds'
   }
 };
-
 const customConfig = {
   production: {
     connection: {

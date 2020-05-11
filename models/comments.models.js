@@ -29,7 +29,7 @@ exports.insertComment = (article_id, comment) => {
         })  
 }
 
-exports.updateCommentById = (article_id, votes) => {
+exports.updateCommentById = (comment_id, votes) => {
     let incValue = 0;
     if (typeof votes === 'number') {
         incValue = votes;
@@ -38,7 +38,7 @@ exports.updateCommentById = (article_id, votes) => {
         return Promise.reject({ status: 400, msg: 'Invalid request' })
     }
     return knex('comments')
-        .where({article_id})
+        .where({comment_id})
         .increment('votes', incValue)
         .returning('*')
         .then((comment) => {

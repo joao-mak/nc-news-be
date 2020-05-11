@@ -481,7 +481,7 @@ describe('/api', () => {
                         expect(body.comment.hasOwnProperty('body')).toBe(true)
                         expect(body.comment.hasOwnProperty('comment_id')).toBe(true)
                         expect(body.comment.hasOwnProperty('votes')).toBe(true)
-                        expect(body.comment.votes).toBe(20);
+                        expect(body.comment.votes).toBe(22);
                     })
             })
             test('PATCH 404: comment not found', () => {
@@ -508,7 +508,7 @@ describe('/api', () => {
                     .send({})
                     .expect(200)
                     .then(({body}) => {
-                        expect(body.comment.votes).toBe(14);
+                        expect(body.comment.votes).toBe(16);
                     })
             })
             test('PATCH 400: invalid request body (inc_votes not a number))', () => {
