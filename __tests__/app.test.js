@@ -24,6 +24,15 @@ describe('/api', () => {
                 expect(body.msg).toBe('Invalid method')
             })
     })
+    test.only('GET 200: responds with JSON endpoints', () => {
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({body}) => {
+                const parsedEndpoints = JSON.parse(body.endpoints)
+                expect(parsedEndpoints["GET /api"]["description"]).toBe("serves up a json representation of all the available endpoints of the api")
+            })
+    })
     describe('/topics', () => {
         test('405: invalid method', () => {
             const invalidMethods = ['post', 'patch', 'delete', 'put'];
